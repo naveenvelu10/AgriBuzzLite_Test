@@ -1,0 +1,4 @@
+Bugs Fixed on : 05-02-2023 20.36PM
+- Customer Forgot Password bugs fixed
+- Farmer Forgot Password bugs fixed
+- Worker Forgot Password bugs fixed
