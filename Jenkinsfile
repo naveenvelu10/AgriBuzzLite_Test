@@ -2,61 +2,53 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME = "agrilite_front"                   // Name for your Docker container
-        IMAGE_NAME = "agrilite_image"                 // Name for Docker image
-        APP_DIR = "/var/www/html"                     // App location inside container
-        HOST_DIR = "${WORKSPACE}/SourceCode"          // Local project folder on Jenkins server
+        // You can define environment variables here if needed
+        DOCKER_IMAGE = 'agrilite_image'
+        DOCKER_CONTAINER = 'agrilite_container'
     }
 
     stages {
-        stage('Checkout') {
+
+        stage('Checkout SCM') {
             steps {
                 echo 'Cloning repository...'
                 git branch: 'main',
                     url: 'https://github.com/naveenvelu10/AgriBuzzLite_Test.git',
-                    credentialsId: 'github-token'   // Use the Jenkins credential you created for GitHub token
+                    credentialsId: 'github-token' // Make sure you added your GitHub token in Jenkins
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 echo 'Building Docker image...'
-                sh "docker build -t ${IMAGE_NAME} -f ${HOST_DIR}/Dockerfile ${HOST_DIR}"
+                sh "docker build -t ${DOCKER_IMAGE} -f ${WORKSPACE}/SourceCode/Dockerfile ${WORKSPACE}/SourceCode"
             }
         }
 
         stage('Stop Existing Container') {
             steps {
-                echo 'Stopping old container if exists...'
+                echo 'Stopping existing container if running...'
                 sh """
-                if [ \$(docker ps -q -f name=${APP_NAME}) ]; then
-                    docker stop ${APP_NAME}
-                    docker rm ${APP_NAME}
-                fi
+                docker stop ${DOCKER_CONTAINER} || true
+                docker rm ${DOCKER_CONTAINER} || true
                 """
             }
         }
 
         stage('Run Container') {
             steps {
-                echo 'Starting new container...'
+                echo 'Running Docker container...'
                 sh """
-                docker run -d --name ${APP_NAME} -p 8056:80 ${IMAGE_NAME}
+                docker run -d --name ${DOCKER_CONTAINER} -p 8080:80 ${DOCKER_IMAGE}
                 """
             }
         }
 
-        stage('Cleanup') {
-            steps {
-                echo 'Removing dangling images...'
-                sh "docker image prune -f"
-            }
-        }
     }
 
     post {
         success {
-            echo 'Deployment successful!'
+            echo 'Deployment succeeded!'
         }
         failure {
             echo 'Deployment failed.'
