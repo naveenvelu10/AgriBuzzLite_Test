@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME = "agriweb"                 // Docker container name
-        IMAGE_NAME = "agriweb_image"         // Docker image name
-        APP_DIR = "/var/www/html"            // App location inside container
-        HOST_DIR = "/home/ubuntu/agriweb"    // Local project folder on Jenkins server
+        APP_NAME = "agrilite"                 // Name for Docker container
+        IMAGE_NAME = "agrilite_image"         // Name for Docker image
+        APP_DIR = "/var/www/html"             // App location inside container
+        HOST_DIR = "${WORKSPACE}/SourceCode"  // Folder containing Dockerfile
     }
 
     stages {
@@ -14,7 +14,7 @@ pipeline {
                 echo 'Cloning repository...'
                 git branch: 'main', 
                     url: 'https://github.com/naveenvelu10/AgriBuzzLite_Test.git', 
-                    credentialsId: 'github-token'  // replace with your Jenkins GitHub token ID
+                    credentialsId: 'github-token'
             }
         }
 
