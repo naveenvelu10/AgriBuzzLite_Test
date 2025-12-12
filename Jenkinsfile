@@ -2,26 +2,26 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME = "agrilite"                 // Name for Docker container
-        IMAGE_NAME = "agrilite_image"         // Name for Docker image
-        APP_DIR = "/var/www/html"             // App location inside container
-        HOST_DIR = "${WORKSPACE}/SourceCode"  // Folder containing Dockerfile
+        APP_NAME = "agrilite_front"                   // Name for your Docker container
+        IMAGE_NAME = "agrilite_image"                 // Name for Docker image
+        APP_DIR = "/var/www/html"                     // App location inside container
+        HOST_DIR = "${WORKSPACE}/SourceCode"          // Local project folder on Jenkins server
     }
 
     stages {
         stage('Checkout') {
             steps {
                 echo 'Cloning repository...'
-                git branch: 'main', 
-                    url: 'https://github.com/naveenvelu10/AgriBuzzLite_Test.git', 
-                    credentialsId: 'github-token'
+                git branch: 'main',
+                    url: 'https://github.com/naveenvelu10/AgriBuzzLite_Test.git',
+                    credentialsId: 'github-token'   // Use the Jenkins credential you created for GitHub token
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 echo 'Building Docker image...'
-                sh "docker build -t agrilite_image ${WORKSPACE}/SourceCode"
+                sh "docker build -t ${IMAGE_NAME} -f ${HOST_DIR}/Dockerfile ${HOST_DIR}"
             }
         }
 
@@ -63,5 +63,4 @@ pipeline {
         }
     }
 }
-
 
